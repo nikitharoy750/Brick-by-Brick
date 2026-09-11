@@ -53,134 +53,16 @@ type Brick = {
   size: number;
 };
 
-function getAlgorithmResult(bricks: Brick[]) {
-  const counts: Record<string, number> = {};
-
-  bricks.forEach((brick) => {
-    brick.concepts.forEach((concept) => {
-      counts[concept] = (counts[concept] || 0) + 1;
-    });
-
-    if (brick.customConcept?.trim()) {
-      counts[brick.customConcept.trim()] =
-        (counts[brick.customConcept.trim()] || 0) + 1;
-    }
-  });
-
-  const sortedConcepts = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-  const topConcepts = sortedConcepts.slice(0, 3).map(([concept]) => concept);
-
-  const has = (concept: string) => (counts[concept] || 0) > 0;
-
-  let personality = "THE QUESTIONABLE SCROLLER";
-  let description =
-    "Your algorithm refuses to commit to one personality, so it decided to become all of them.";
-  let roast =
-    "Your feed has seen enough of your decisions to know better, yet it keeps recommending more.";
-
-  if (has("Brainrot") && (has("Meme") || has("Unhinged"))) {
-    personality = "THE CHRONICALLY ONLINE MENACE";
-    description =
-      "Your algorithm has stopped asking what you like and started asking how much nonsense you can survive.";
-    roast =
-      "At this point, your screen time isn't a habit. It's a long-term relationship.";
-  } else if (has("Educational") && has("Relatable")) {
-    personality = "THE PRODUCTIVE PROCRASTINATOR";
-    description =
-      "You collect educational Reels with the confidence of someone who will absolutely never watch them again.";
-    roast =
-      "You don't procrastinate. You conduct extremely detailed research on things you should be doing.";
-  } else if (has("Main Character") && (has("Aesthetics") || has("Cinematic"))) {
-    personality = "THE MAIN CHARACTER";
-    description =
-      "Apparently every coffee, sunset, outfit and minor inconvenience is part of your cinematic universe.";
-    roast =
-      "Your algorithm thinks you are one slow-motion walk away from a movie trailer.";
-  } else if (has("Delusional") || has("Sigma")) {
-    personality = "THE DELUSIONAL VISIONARY";
-    description =
-      "Your feed has convinced you that questionable decisions are actually signs of greatness.";
-    roast =
-      "The confidence is impressive. The evidence supporting it is currently unavailable.";
-  } else if (has("Food Obsession")) {
-    personality = "THE FOOD INFLUENCER";
-    description =
-      "Your algorithm has quietly turned every meal into a personality trait.";
-    roast =
-      "You don't need a food recommendation. You need someone to take your phone away before dinner.";
-  } else if (has("Gaming")) {
-    personality = "THE DIGITAL WARRIOR";
-    description =
-      "Your algorithm understands one simple truth: real-life responsibilities can wait.";
-    roast =
-      "Your greatest achievement today was probably checking whether the loading screen had finished.";
-  } else if (has("Romance")) {
-    personality = "THE DELUSIONAL ROMANTIC";
-    description =
-      "Your algorithm is three edits away from convincing you that a stranger making eye contact is destiny.";
-    roast =
-      "You don't need dating advice. You need to stop turning every interaction into a plotline.";
-  } else if (has("Sarcastic") || has("Dark Humour")) {
-    personality = "THE SARCASM DEPARTMENT";
-    description =
-      "Your algorithm processes most of life through sarcasm, questionable jokes and emotional damage.";
-    roast =
-      "Your sense of humour has filed several complaints against your sense of responsibility.";
-  } else if (has("Animals")) {
-    personality = "THE ANIMAL SIDE QUEST";
-    description =
-      "No matter what you came online to do, an animal Reel successfully derailed the mission.";
-    roast =
-      "Your algorithm has one weakness, and apparently it has four legs.";
-  }
-
-  const totalBricks = Math.max(bricks.length, 1);
-  const topCount = sortedConcepts[0]?.[1] || 0;
-  const brainrotScore = Math.min(
-    99,
-    12 + (counts["Brainrot"] || 0) * 18 + (counts["Meme"] || 0) * 7
-  );
-  const delusionScore = Math.min(
-    99,
-    15 +
-      (counts["Delusional"] || 0) * 20 +
-      (counts["Main Character"] || 0) * 10 +
-      (counts["Sigma"] || 0) * 12
-  );
-  const mainCharacterScore = Math.min(
-    99,
-    18 +
-      (counts["Main Character"] || 0) * 22 +
-      (counts["Aesthetics"] || 0) * 8 +
-      (counts["Cinematic"] || 0) * 8
-  );
-  const usefulScore = Math.min(
-    99,
-    Math.max(
-      2,
-      5 +
-        ((counts["Educational"] || 0) / totalBricks) * 60 -
-        ((counts["Brainrot"] || 0) / totalBricks) * 15
-    )
-  );
-
-  const topCombination =
-    topConcepts.length > 0
-      ? topConcepts.join(" + ")
-      : "No concepts detected";
-
-  return {
-    personality,
-    description,
-    roast,
-    brainrotScore: Math.round(brainrotScore),
-    delusionScore: Math.round(delusionScore),
-    mainCharacterScore: Math.round(mainCharacterScore),
-    usefulScore: Math.round(usefulScore),
-    topCombination,
-    topCount,
-  };
-}
+type AlgorithmResult = {
+  personality: string;
+  description: string;
+  roast: string;
+  topCombination: string;
+  delusionScore: number;
+  brainrotScore: number;
+  mainCharacterScore: number;
+  usefulScore: number;
+};
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(false);
@@ -198,6 +80,8 @@ export default function Home() {
   const [analysisStarted, setAnalysisStarted] = useState(false);
   const [analysisStep, setAnalysisStep] = useState(0);
   const [showResult, setShowResult] = useState(false);
+  const [algorithmResult, setAlgorithmResult] = useState<AlgorithmResult | null>(null);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [deletingBrickId, setDeletingBrickId] = useState<number | null>(null);
 
   // ADD BRICK animation states
@@ -228,8 +112,6 @@ export default function Home() {
   const buildSectionRef = useRef<HTMLElement | null>(null);
   const wallSectionRef = useRef<HTMLDivElement | null>(null);
   const aboutSectionRef = useRef<HTMLDivElement | null>(null);
-
-  const algorithmResult = getAlgorithmResult(bricks);
 
   function scrollToSection(
     sectionRef: React.RefObject<HTMLElement | null>
@@ -312,26 +194,79 @@ export default function Home() {
     }, 650);
   }
 
-  function buildAlgorithm() {
-    if (bricks.length === 0) return;
+  async function buildAlgorithm() {
+    if (bricks.length === 0 || isBuilding) return;
 
     setAnalysisStarted(true);
     setShowResult(false);
+    setAnalysisError(null);
     setIsBuilding(true);
     setAnalysisStep(1);
 
-    // Reveal one analysis message every 3 seconds.
-    for (let step = 2; step <= 6; step++) {
-      setTimeout(() => {
-        setAnalysisStep(step);
-      }, (step - 1) * 3000);
-    }
+    const startedAt = Date.now();
 
-    // Finish the analysis after 18 seconds.
-    setTimeout(() => {
+    // Keep the funny analysis messages moving while Gemini works.
+    const stepTimer = window.setInterval(() => {
+      setAnalysisStep((currentStep) => Math.min(currentStep + 1, 6));
+    }, 1500);
+
+    try {
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          bricks,
+          reelUrl,
+          caption: "",
+          hashtags: [],
+          audioTranscript: "",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to analyze the algorithm.");
+      }
+
+      const result: AlgorithmResult = {
+        personality: data.personality,
+        description: data.description,
+        roast: data.roast,
+        topCombination: data.topCombination,
+        delusionScore: Number(data.delusion),
+        brainrotScore: Number(data.brainrot),
+        mainCharacterScore: Number(data.mainCharacter),
+        usefulScore: Number(data.usefulContent),
+      };
+
+      setAlgorithmResult(result);
+
+      // Give the loading animation enough time to show all six messages.
+      const elapsed = Date.now() - startedAt;
+      const minimumLoadingTime = 9000;
+      const remainingTime = Math.max(0, minimumLoadingTime - elapsed);
+
+      if (remainingTime > 0) {
+        await new Promise((resolve) => setTimeout(resolve, remainingTime));
+      }
+
+      setAnalysisStep(6);
       setIsBuilding(false);
       setShowResult(true);
-    }, 18000);
+    } catch (error) {
+      console.error("Algorithm analysis error:", error);
+      setAnalysisError(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong while analyzing your bricks."
+      );
+      setIsBuilding(false);
+    } finally {
+      window.clearInterval(stepTimer);
+    }
   }
 
   return (
@@ -1162,6 +1097,12 @@ export default function Home() {
                 ANALYSING YOUR ALGORITHM...
               </h2>
 
+              {analysisError && (
+                <div className="mt-4 rounded-2xl bg-[#3A2525] p-4 text-xs font-bold text-[#FFB4B4]">
+                  {analysisError}
+                </div>
+              )}
+
               <div className="mt-5 min-h-[170px] space-y-3 text-xs leading-relaxed text-[#D6D6D6]">
 
                 {analysisStep >= 1 && (
@@ -1205,7 +1146,7 @@ export default function Home() {
             </motion.div>
           )}
 
-          {showResult && (
+          {showResult && algorithmResult && (
             <motion.div
               initial={{ opacity: 0, y: 35, scale: 0.94 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
