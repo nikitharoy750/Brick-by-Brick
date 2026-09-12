@@ -19,8 +19,30 @@
   }
 }
 
+html,
 body {
-  background: var(--background);
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+
+  /* ===== BACKGROUND GRID ===== */
+  background-color: #F5F1EA;
+
+  background-image:
+    linear-gradient(
+      rgba(70, 55, 45, 0.10) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(70, 55, 45, 0.10) 1px,
+      transparent 1px
+    );
+
+  background-size: 28px 28px;
+  background-position: 0 0;
 }

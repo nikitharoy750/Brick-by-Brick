@@ -280,7 +280,7 @@ export default function Home() {
       </AnimatePresence>
 
 
-      <main className="min-h-screen bg-[#F5F1EA] text-[#252525]">
+      <main className="min-h-screen bg-transparent text-[#252525]">
 
       {/* ================= NAVBAR ================= */}
 

@@ -1,0 +1,424 @@
+.brick-preview-wrap {
+  --brick-scale: 1;
+  --brick-colour: #b9573d;
+
+  position: relative;
+  width: calc(220px * var(--brick-scale));
+  height: calc(90px * var(--brick-scale));
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0;
+  cursor: default;
+  transform-origin: center;
+}
+
+/* Main brick container */
+.brick-preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/*
+  DARK PIXELATED OUTLINE
+
+  The uneven polygon makes the brick look hand-pixelated
+  instead of like a perfect rectangle.
+*/
+.brick-preview__outline {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+
+  background: #351d1a;
+
+  clip-path: polygon(
+    0% 10%,
+    5% 10%,
+    5% 4%,
+    18% 4%,
+    18% 7%,
+    34% 7%,
+    34% 2%,
+    49% 2%,
+    49% 6%,
+    68% 6%,
+    68% 3%,
+    84% 3%,
+    84% 7%,
+    96% 7%,
+    96% 14%,
+    100% 14%,
+
+    100% 82%,
+    96% 82%,
+    96% 91%,
+    83% 91%,
+    83% 96%,
+    68% 96%,
+    68% 92%,
+    51% 92%,
+    51% 98%,
+    34% 98%,
+    34% 94%,
+    17% 94%,
+    17% 97%,
+    5% 97%,
+    5% 90%,
+    0% 90%
+  );
+}
+
+/*
+  INNER BRICK FACE
+
+  Slightly smaller than the dark outline so the outline
+  remains thick and visible.
+*/
+.brick-preview__face {
+  position: absolute;
+
+  top: 6px;
+  left: 6px;
+  right: 6px;
+  bottom: 6px;
+
+  overflow: hidden;
+
+  background: var(--brick-colour);
+
+  clip-path: polygon(
+    0% 10%,
+    6% 10%,
+    6% 4%,
+    19% 4%,
+    19% 7%,
+    35% 7%,
+    35% 2%,
+    48% 2%,
+    48% 6%,
+    67% 6%,
+    67% 3%,
+    83% 3%,
+    83% 7%,
+    96% 7%,
+    96% 14%,
+    100% 14%,
+
+    100% 82%,
+    95% 82%,
+    95% 91%,
+    82% 91%,
+    82% 96%,
+    68% 96%,
+    68% 92%,
+    51% 92%,
+    51% 98%,
+    34% 98%,
+    34% 94%,
+    17% 94%,
+    17% 97%,
+    6% 97%,
+    6% 90%,
+    0% 90%
+  );
+}
+
+
+/* =========================================================
+   PIXEL PATCHES
+   ========================================================= */
+
+/*
+  LIGHT PEACH AREAS
+  These imitate the lighter blocks seen throughout
+  the reference image.
+*/
+
+.brick-patch {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+
+.brick-patch--light-1 {
+  left: 7%;
+  top: 13%;
+  width: 17%;
+  height: 15%;
+
+  background: #d98263;
+}
+
+.brick-patch--light-2 {
+  left: 24%;
+  top: 16%;
+  width: 9%;
+  height: 9%;
+
+  background: #c96e51;
+}
+
+.brick-patch--light-3 {
+  left: 71%;
+  top: 9%;
+  width: 14%;
+  height: 17%;
+
+  background: #d47b5d;
+}
+
+
+/*
+  DARK RED/BROWN PATCHES
+*/
+
+.brick-patch--dark-1 {
+  left: 39%;
+  top: 57%;
+  width: 20%;
+  height: 20%;
+
+  background: #8f4034;
+}
+
+.brick-patch--dark-2 {
+  left: 67%;
+  top: 37%;
+  width: 11%;
+  height: 18%;
+
+  background: #934334;
+}
+
+.brick-patch--dark-3 {
+  left: 12%;
+  top: 59%;
+  width: 8%;
+  height: 17%;
+
+  background: #84392f;
+}
+
+
+/* =========================================================
+   EXTRA PIXEL BLOCKS
+   ========================================================= */
+
+/*
+  These use pseudo-elements to create additional
+  rectangular chunks across the surface.
+*/
+
+.brick-preview__face::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  background:
+    /* large light block */
+    linear-gradient(
+      to right,
+      transparent 0%,
+      transparent 57%,
+      #c96d50 57%,
+      #c96d50 67%,
+      transparent 67%
+    ),
+
+    /* dark horizontal block */
+    linear-gradient(
+      to bottom,
+      transparent 0%,
+      transparent 30%,
+      #9b4637 30%,
+      #9b4637 39%,
+      transparent 39%
+    ),
+
+    /* peach block */
+    linear-gradient(
+      to right,
+      transparent 0%,
+      transparent 82%,
+      #d17a5b 82%,
+      #d17a5b 92%,
+      transparent 92%
+    );
+
+  opacity: 0.65;
+}
+
+
+/*
+  Smaller pixel fragments.
+*/
+
+.brick-preview__face::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      to right,
+      transparent 0 13%,
+      #a44735 13% 17%,
+      transparent 17% 100%
+    ),
+
+    linear-gradient(
+      to bottom,
+      transparent 0 70%,
+      #c96b4e 70% 77%,
+      transparent 77% 100%
+    ),
+
+    linear-gradient(
+      to right,
+      transparent 0 46%,
+      #d78363 46% 52%,
+      transparent 52% 100%
+    );
+
+  opacity: 0.55;
+}
+
+
+/* =========================================================
+   PIXELATED EDGE CUTOUTS
+   ========================================================= */
+
+.brick-notch {
+  position: absolute;
+  display: block;
+
+  background: #351d1a;
+
+  pointer-events: none;
+}
+
+.brick-notch--top {
+  left: 43%;
+  top: 0;
+
+  width: 5%;
+  height: 7%;
+}
+
+.brick-notch--right {
+  right: 0;
+  top: 42%;
+
+  width: 4%;
+  height: 12%;
+}
+
+.brick-notch--bottom {
+  left: 59%;
+  bottom: 0;
+
+  width: 6%;
+  height: 7%;
+}
+
+.brick-notch--left {
+  left: 0;
+  top: 65%;
+
+  width: 4%;
+  height: 11%;
+}
+
+
+/* =========================================================
+   SUBTLE PIXEL TEXTURE
+   ========================================================= */
+
+.brick-surface {
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  opacity: 0.18;
+
+  background-image:
+    /* tiny dark pixels */
+    radial-gradient(
+      rectangle,
+      rgba(70, 28, 23, 0.45) 0 1px,
+      transparent 1px
+    ),
+
+    /* tiny light pixels */
+    radial-gradient(
+      rectangle,
+      rgba(255, 185, 150, 0.35) 0 1px,
+      transparent 1px
+    );
+
+  background-size:
+    19px 17px,
+    23px 21px;
+
+  background-position:
+    3px 5px,
+    10px 2px;
+}
+
+
+/* =========================================================
+   FINISH VARIATIONS
+   ========================================================= */
+
+.brick-preview--rough .brick-surface {
+  opacity: 0.28;
+
+  background-image:
+    radial-gradient(
+      circle,
+      rgba(62, 27, 22, 0.5) 0 1px,
+      transparent 1.5px
+    ),
+    radial-gradient(
+      circle,
+      rgba(245, 160, 125, 0.35) 0 1px,
+      transparent 1.5px
+    );
+
+  background-size:
+    11px 13px,
+    17px 15px;
+}
+
+
+.brick-preview--textured .brick-surface {
+  opacity: 0.22;
+
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent 0 70%,
+      rgba(75, 29, 23, 0.35) 70% 73%,
+      transparent 73%
+    ),
+    linear-gradient(
+      0deg,
+      transparent 0 42%,
+      rgba(255, 184, 145, 0.25) 42% 45%,
+      transparent 45%
+    );
+
+  background-size:
+    27px 19px,
+    21px 23px;
+}
+ 
